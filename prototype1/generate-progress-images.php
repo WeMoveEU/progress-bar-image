@@ -1,13 +1,14 @@
 <?php
 
+// Pulling data for progress bar
+
 $json = file_get_contents('http://dataviz.wemove.eu/public/question/f6a48e99-e64d-4fa3-b7dc-4477c2537412.json');
 $obj = json_decode($json);
 $count = $obj[0]->count;
 $goal = 1000;
 $progress = $count / $goal;
 
-
-// Color versions
+// Color versions definitions
 
 $tealSet = array(
   "name" => "teal",
@@ -30,7 +31,7 @@ $yellowSet = array(
 $colorSets = array($tealSet, $purpleSet, $yellowSet);
 $colorTransparent = new ImagickPixel("none");
 
-// Size versions
+// Size versions definitions
 
 $regularSize = array(
   "name" => "regular",
@@ -42,13 +43,18 @@ $regularSize = array(
   "triangleSize" => 4,
   "triangleOffset" => 2,
   "bottomTextOffset" => 17,
-  "topTextOffset" => 8
+  "topTextOffset" => 8,
+  "fontSize" => 15
 );
 
 $sizeSets = array($regularSize);
 
+
+// Let's start looping over sizes to generate N = (color x sizes) images
+
 foreach ($sizeSets as $sizeSet) {
 
+  // let's redefine vars first, for more clarity further down the way
   $imageWidth = $sizeSet["imageWidth"];
   $imageHeight = $sizeSet["imageHeight"];
   $goalBarHeight = $sizeSet["goalBarHeight"];
@@ -59,18 +65,24 @@ foreach ($sizeSets as $sizeSet) {
   $bottomTextOffset = $sizeSet["bottomTextOffset"];
   $topTextOffset = $sizeSet["topTextOffset"];
 
+  // calculating elements positions
   $goalBarLeftMargin = $goalBarRightMargin = ($imageWidth - $goalBarWidth) / 2;
   $goalBarTopMargin = ($imageHeight - $goalBarHeight) / 2 ;
   $goalBarBottomMargin = ($imageHeight - $goalBarHeight) / 2;
 
-  // Don't get longer than max
+  // Don't get longer than the size of whole bar
   $progressChange = $progress < 1 ?
     $goalBarLeftMargin + ($progress * $goalBarWidth) : $goalBarLeftMargin + $goalBarWidth;
+
+  // got sizes roughly calculated, we can now loop over colors
 
   foreach ($colorSets as $colorSet) {
 
     $draw = new ImagickDraw();
-    $draw->setFontSize(15);
+
+    // Let's put letters first
+
+    $draw->setFontSize($sizeSet["fontSize"]);
     $draw->setStrokeAntialias(TRUE);
     $draw->setTextAntialias(TRUE);
     $draw->setTextAlignment(\Imagick::ALIGN_LEFT);
@@ -80,6 +92,7 @@ foreach ($sizeSets as $sizeSet) {
     $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
     $draw->annotation($progressChange, $goalBarTopMargin - $topTextOffset, "$count");
 
+    // Now draw the rectangle for progress already made
 
     $draw->setStrokeColor($colorSet["done"]);
     $draw->setFillColor($colorSet["done"]);
@@ -88,12 +101,16 @@ foreach ($sizeSets as $sizeSet) {
       $progressChange, $imageHeight - $goalBarBottomMargin,
       $goalBarRounding, $goalBarRounding);
 
+    // Now fill it up to the goal size with inactive/upcoming color
+
     $draw->setStrokeColor($colorSet["upcoming"]);
     $draw->setFillColor($colorSet["upcoming"]);
     $draw->roundRectangle(
       $progressChange, $goalBarTopMargin,
       $imageWidth - $goalBarRightMargin, $imageHeight - $goalBarBottomMargin,
       $goalBarRounding, $goalBarRounding);
+
+    // Draw some triangles and lines to coverup the gap between bars
 
     $topTriangle = [
       [
@@ -124,7 +141,6 @@ foreach ($sizeSets as $sizeSet) {
       ],
     ];
 
-
     $draw->setStrokeAntialias(TRUE);
     $draw->setStrokeColor($colorSet["divider"]);
     $draw->setFillColor($colorSet["divider"]);
@@ -132,6 +148,7 @@ foreach ($sizeSets as $sizeSet) {
     $draw->polygon($bottomTriangle);
     $draw->line($topTriangle[2]['x'], $topTriangle[2]['y'], $bottomTriangle[2]['x'], $bottomTriangle[2]['y']);
 
+    // ...generate and write down final an image
 
     $canvas = new Imagick();
     $canvas->newImage($imageWidth, $imageHeight, $colorTransparent);
