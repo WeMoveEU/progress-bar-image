@@ -47,7 +47,6 @@ $regularSize = array(
 
 $sizeSets = array($regularSize);
 
-
 foreach ($sizeSets as $sizeSet) {
 
   $imageWidth = $sizeSet["imageWidth"];
