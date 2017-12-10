@@ -2,11 +2,17 @@
 
 // Pulling data for progress bar
 
-$json = file_get_contents('http://dataviz.wemove.eu/public/question/f6a48e99-e64d-4fa3-b7dc-4477c2537412.json');
-$obj = json_decode($json);
-$count = $obj[0]->count;
-$goal = 1000;
-$progress = $count / $goal;
+//$json = file_get_contents('http://dataviz.wemove.eu/public/question/f6a48e99-e64d-4fa3-b7dc-4477c2537412.json');
+$json = null;
+if( $json !== FALSE ) {
+//  $obj = json_decode($json);
+  $count = 400; //$obj[0]->count;
+  $goal = 1000;
+  $progress = $count / $goal;
+} else {
+  // bail out and do nothing, we don't have numbers
+  die(1);
+}
 
 // Color versions definitions
 
@@ -33,12 +39,12 @@ $colorTransparent = new ImagickPixel("none");
 
 // Size versions definitions
 
-$regularSize = array(
-  "name" => "regular",
-  "imageWidth" => 480,
+$shortSize = array(
+  "name" => "short",
+  "imageWidth" => 300,
   "imageHeight" => 75,
   "goalBarHeight" => 25,
-  "goalBarWidth" => 420,
+  "goalBarWidth" => 270,
   "goalBarRounding" => 5,
   "triangleSize" => 4,
   "triangleOffset" => 2,
@@ -47,7 +53,37 @@ $regularSize = array(
   "fontSize" => 15
 );
 
-$sizeSets = array($regularSize);
+$regularSize = array(
+  "name" => "regular",
+  "imageWidth" => 500,
+  "imageHeight" => 75,
+  "goalBarHeight" => 25,
+  "goalBarWidth" => 480,
+  "goalBarRounding" => 5,
+  "triangleSize" => 4,
+  "triangleOffset" => 2,
+  "bottomTextOffset" => 17,
+  "topTextOffset" => 8,
+  "fontSize" => 15
+);
+
+$longSize = array(
+  "name" => "long",
+  "imageWidth" => 720,
+  "imageHeight" => 75,
+  "goalBarHeight" => 25,
+  "goalBarWidth" => 700,
+  "goalBarRounding" => 5,
+  "triangleSize" => 4,
+  "triangleOffset" => 2,
+  "bottomTextOffset" => 17,
+  "topTextOffset" => 8,
+  "fontSize" => 15
+);
+
+
+
+$sizeSets = array($shortSize, $regularSize, $longSize);
 
 
 // Let's start looping over sizes to generate N = (color x sizes) images
