@@ -13,6 +13,12 @@ if( $json !== FALSE ) {
   die(1);
 }
 
+// There is also a case when something goes wrong 
+// and json returns 0 - we don't want to show that as well
+if( $count == 0 ) {
+  die(1);
+}
+
 // Color versions definitions
 
 $tealSet = array(
