@@ -3,7 +3,6 @@
 // Pulling data for progress bar
 
 $json = file_get_contents('http://dataviz.wemove.eu/public/question/f6a48e99-e64d-4fa3-b7dc-4477c2537412.json');
-$json = null;
 if( $json !== FALSE ) {
   $obj = json_decode($json);
   $count = $obj[0]->count;
