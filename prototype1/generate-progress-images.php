@@ -198,7 +198,7 @@ foreach ($sizeSets as $sizeSet) {
     $canvas->setImageFormat('png');
 
     /* Output the image */
-    $canvas->writeImage("progressbar-" . $colorSet["name"] . "-" . $sizeSet["name"] . ".png");
+    $canvas->writeImage(realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "progressbar-" . $colorSet["name"] . "-" . $sizeSet["name"] . ".png");
   }
 }
 ?>
