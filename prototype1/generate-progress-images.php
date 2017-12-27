@@ -7,6 +7,7 @@ if( $json !== FALSE ) {
   $obj = json_decode($json);
   $count = $obj[0]->count;
   $goal = 1000;
+  if( $count > $goal) $count = $goal;
   $progress = $count / $goal;
 } else {
   // bail out and do nothing, we don't have numbers
@@ -131,7 +132,13 @@ foreach ($sizeSets as $sizeSet) {
     $draw->setTextAlignment(\Imagick::ALIGN_RIGHT);
     $draw->annotation($imageWidth - $goalBarRightMargin, $imageHeight - $goalBarBottomMargin + $bottomTextOffset, "$goal");
     $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
-    $draw->annotation($progressChange, $goalBarTopMargin - $topTextOffset, "$count");
+
+    // move displayed count a bit to the left when we are reaching right edge
+    if( $progressChange < 0.95 ) {
+      $draw->annotation($progressChange, $goalBarTopMargin - $topTextOffset, "$count");
+    } else {
+      $draw->annotation($progressChange-10, $goalBarTopMargin - $topTextOffset, "$count");
+    }
 
     // Now draw the rectangle for progress already made
 
